@@ -1,48 +1,48 @@
-date_default_timezone_set(“Asia/Jakarta”);
 <?php
-	//Create database connection using config file 
-   include_once("config.php");
+include_once('koneksi.php');
 
-	//Fetch all users data from database
-	$result= mysqli_query($conn, "select * from users ORDER By id DESC");
+if ( isset($_POST["masuk"]) ) {
+	$username = $_POST["username"];
+	$password = $_POST["password"];
+	
+	$result = mysqli_query($conn, "SELECT * FROM user WHERE username = '$username'");
+	if(mysqli_num_rows($result) === 1){
+		$row = mysqli_fetch_assoc($result);
+		if( password_verify($password, $row["password"])){
+		header("Location: login.php");
+		exit;
+		}
+	}
+
+	$eror = true;
+}
 ?>
+
+
+<!DOCTYPE html>
 <html>
 <head>
-	<title>HomePage</title>
+	<title>Login</title>
 </head>
 <body>
-	<?php
-		if( isset($_POST['cari'])){
-			$searchKey = $_POST['cari'];
-			$sql = "SELECT * FROM users WHERE name LIKE '%$searchKey%' OR mobile LIKE '%searchKey%'";
-		}else
-			$sql = "SELECT * FROM users";
-			$result = mysqli_query($conn, $sql);
-		?>
-	<form action="" method="POST">
-		<input type="text" name="cari" placeholder="cari nama">
-		<input type="submit" name="tekan" placeholder="go">
-
+	<h1>Halaman Login</h1>
+	<?php if( isset($eror)) : ?>
+		<p>salah</p>
+	<?php endif; ?>
+<ul>
+	<form action="login.php" method="post">
+		<li>
+			<label for="username">Username</label>
+			<input type="text' name="Username" id="Username">
+		</li>
+		<li>
+			<label for="password">Password</label>
+			<input type="password" name="Password" id="Password">
+		</li>
+		<li>
+			<button type=submit" name="submit">Masuk</button>
+		</li>
 	</form>
-	<a href="add.html">add new user</a><br/><br/>
-	<table width="90%" border=5>
-		<tr>
-			<th>name</th>
-			<th>mobile</th>
-			<th>email</th>
-			<th style="width: 200px" height="50px">foto</th>
-			<th>tindakan</th>
-		</tr>
-<?php
-	while($user_data=mysqli_fetch_array($result)){
-		echo "<tr>";
-		echo "<td>" . $user_data['name']."</td>";
-		echo "<td>" . $user_data['mobile']."</td>";
-		echo "<td>" . $user_data['email']."</td>";
-		echo "<td><img width='80' src='terupload/" . $user_data['foto'] . "'</td>";
-		echo "<td><a href='edit.php?id=$user_data[id]'>Edit</a> | <a href='delete.php?id=$user_data[id]'>Delete</a></td></tr>";
-	}
-?>
-</table>
+</ul>
 </body>
 </html>
